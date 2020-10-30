@@ -42,3 +42,11 @@ screenshots/
 
 # mix phx.gen.cert self-signed certs for dev
 /apps/block_scout_web/priv/cert
+.idea/libraries
+.idea/.gitignore
+.idea/blockscout.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/sqldialects.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/Project_Default.xml

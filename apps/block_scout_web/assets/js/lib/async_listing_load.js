@@ -296,6 +296,34 @@ function firstPageLoad (store) {
       .fail(() => store.dispatch({ type: 'REQUEST_ERROR' }))
       .always(() => store.dispatch({ type: 'FINISH_REQUEST' }))
   }
+
+  function loadItemsTagsChanged (tags) {
+    const path = window.location.href
+    if (tags) {
+      if (path.includes('token_holders')) {
+        store.dispatch({ type: 'START_REQUEST' })
+        $.getJSON(path, { tags: tags, type: 'JSON' })
+          .done(response => store.dispatch(Object.assign({ type: 'ITEMS_FETCHED' }, humps.camelizeKeys(response))))
+          .fail(() => store.dispatch({ type: 'REQUEST_ERROR' }))
+          .always(() => store.dispatch({ type: 'FINISH_REQUEST' }))
+      }
+      else {
+        store.dispatch({ type: 'START_REQUEST' })
+        $.getJSON(path, { index: 0, tags: tags, type: 'JSON' })
+          .done(response => store.dispatch(Object.assign({ type: 'ITEMS_FETCHED' }, humps.camelizeKeys(response))))
+          .fail(() => store.dispatch({ type: 'REQUEST_ERROR' }))
+          .always(() => store.dispatch({ type: 'FINISH_REQUEST' }))
+      }
+    }
+    else {
+      store.dispatch({ type: 'START_REQUEST' })
+      $.getJSON(path, { type: 'JSON' })
+        .done(response => store.dispatch(Object.assign({ type: 'ITEMS_FETCHED' }, humps.camelizeKeys(response))))
+        .fail(() => store.dispatch({ type: 'REQUEST_ERROR' }))
+        .always(() => store.dispatch({ type: 'FINISH_REQUEST' }))
+    }
+  }
+
   loadItemsNext()
 
   $element.on('click', '[data-error-message]', (event) => {
@@ -314,6 +342,16 @@ function firstPageLoad (store) {
     event.preventDefault()
     loadItemsPrev()
     store.dispatch({ type: 'NAVIGATE_TO_NEWER' })
+    event.stopImmediatePropagation()
+  })
+
+  $element.on('keyup', '[data-tags-search]', (event) => {
+    event.preventDefault()
+    const tags = event.target.value
+    setTimeout(() => {
+      if (tags !== event.target.value) return
+      loadItemsTagsChanged(tags.toLowerCase())
+    }, 500)
     event.stopImmediatePropagation()
   })
 }

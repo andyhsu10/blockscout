@@ -11,6 +11,48 @@ defmodule BlockScoutWeb.Tokens.TransferController do
   {:ok, burn_address_hash} = Chain.string_to_address_hash("0x0000000000000000000000000000000000000000")
   @burn_address_hash burn_address_hash
 
+  def index(conn, %{"token_id" => address_hash_string, "tags" => tags, "type" => "JSON"} = params) do
+    with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
+         {:ok, token} <- Chain.token_from_address_hash(address_hash),
+         token_transfers <- Chain.fetch_token_transfers_from_token_hash_and_tags(address_hash, tags, paging_options(params)) do
+      {token_transfers_paginated, next_page} = split_list_by_page(token_transfers)
+
+      next_page_path =
+        case next_page_params(next_page, token_transfers_paginated, params) do
+          nil ->
+            nil
+
+          next_page_params ->
+            token_transfer_path(
+              conn,
+              :index,
+              Address.checksum(token.contract_address_hash),
+              Map.delete(next_page_params, "type")
+            )
+        end
+
+      transfers_json =
+        Enum.map(token_transfers_paginated, fn transfer ->
+          View.render_to_string(
+            TransferView,
+            "_token_transfer.html",
+            conn: conn,
+            token: token,
+            token_transfer: transfer,
+            burn_address_hash: @burn_address_hash
+          )
+        end)
+
+      json(conn, %{items: transfers_json, next_page_path: next_page_path})
+    else
+      :error ->
+        unprocessable_entity(conn)
+
+      {:error, :not_found} ->
+        not_found(conn)
+    end
+  end
+
   def index(conn, %{"token_id" => address_hash_string, "type" => "JSON"} = params) do
     with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
          {:ok, token} <- Chain.token_from_address_hash(address_hash),

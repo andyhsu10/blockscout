@@ -2,6 +2,7 @@ defmodule BlockScoutWeb.Tokens.OverviewView do
   use BlockScoutWeb, :view
 
   alias Explorer.Chain.{Address, SmartContract, Token}
+  alias Timex
 
   alias BlockScoutWeb.{CurrencyHelpers, LayoutView}
 
@@ -17,6 +18,10 @@ defmodule BlockScoutWeb.Tokens.OverviewView do
 
   def total_supply?(%Token{total_supply: nil}), do: false
   def total_supply?(%Token{total_supply: _}), do: true
+
+  def formatted_timestamp(%Token{last_sync: timestamp}) do
+    Timex.format!(timestamp, "%b-%d-%Y %H:%M:%S %p %Z", :strftime)
+  end
 
   @doc """
   Get the current tab name/title from the request path and possible tab names.

@@ -57,7 +57,8 @@ defmodule Explorer.Chain.Address do
           contracts_creation_transaction: %Ecto.Association.NotLoaded{} | Transaction.t(),
           inserted_at: DateTime.t(),
           updated_at: DateTime.t(),
-          nonce: non_neg_integer() | nil
+          nonce: non_neg_integer() | nil,
+          tags: String.t() | nil,
         }
 
   @derive {Poison.Encoder,
@@ -68,7 +69,7 @@ defmodule Explorer.Chain.Address do
              :token,
              :contracts_creation_internal_transaction,
              :contracts_creation_transaction,
-             :names
+             :names,
            ]}
 
   @primary_key {:hash, Hash.Address, autogenerate: false}
@@ -81,6 +82,7 @@ defmodule Explorer.Chain.Address do
     field(:verified, :boolean, default: false)
     field(:has_decompiled_code?, :boolean, virtual: true)
     field(:stale?, :boolean, virtual: true)
+    field(:tags, :string)
 
     has_one(:smart_contract, SmartContract)
     has_one(:token, Token, foreign_key: :contract_address_hash)

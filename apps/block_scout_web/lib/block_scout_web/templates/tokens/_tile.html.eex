@@ -38,10 +38,10 @@
       <span data-test="token_supply"><%= format_integer_to_currency(@token.total_supply) %></span>
     <% end %> <%= @token.symbol %>
   </td>
-  <td class="stakes-td">
+  <%# <td class="stakes-td">
     <span class="mr-4">
       <span data-test="transaction_count">
         <%= @token.holder_count %>
     </span>
-  </td>
+  </td> %>
 </tr>

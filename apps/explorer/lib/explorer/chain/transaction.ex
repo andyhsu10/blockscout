@@ -163,7 +163,8 @@ defmodule Explorer.Chain.Transaction do
           uncles: %Ecto.Association.NotLoaded{} | [Block.t()],
           v: v(),
           value: Wei.t(),
-          revert_reason: String.t()
+          revert_reason: String.t(),
+          tags: String.t() | nil,
         }
 
   @derive {Poison.Encoder,
@@ -182,7 +183,8 @@ defmodule Explorer.Chain.Transaction do
              :s,
              :v,
              :status,
-             :value
+             :value,
+             :tags
            ]}
 
   @primary_key {:hash, Hash.Full, autogenerate: false}
@@ -204,6 +206,7 @@ defmodule Explorer.Chain.Transaction do
     field(:v, :decimal)
     field(:value, Wei)
     field(:revert_reason, :string)
+    field(:tags, :string)
 
     # A transient field for deriving old block hash during transaction upserts.
     # Used to force refetch of a block in case a transaction is re-collated

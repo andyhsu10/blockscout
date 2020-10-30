@@ -8,12 +8,90 @@
   ) %>
 
   <section data-page="token-transfer-list">
+    <script>
+      function tokenPageTransactionRemoveTag(address, tag) {
+        var existingTags = [];
+        if(document.querySelector('[data-identifier-hash="' + address + '"] .tags').children.length != 0){
+          let existingTags2 = document.querySelector('[data-identifier-hash="' + address + '"] .tags').children
+          for(let i =0; i < existingTags2.length; i++){
+            existingTags.push(existingTags2[i].getAttribute('data-tag'));
+          }
+        }else{
+          return;
+        }
+        var newTags = existingTags.filter(tag1 => tag1 != tag);
+        var xhr = new XMLHttpRequest()
+        xhr.open('GET', `/tx/${address}/tag?tags=` + newTags.join(','), true)
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            let response = xhr.response;
+            response = JSON.parse(response)
+            if (response.result) {
+              document.querySelector('[data-identifier-hash="' + address + '"] [data-tag="' + tag + '"]').remove();
+            }
+          }
+        }
+        xhr.send()
+      }
+
+      function tokenPageTransactionShowAddTagInput(address) {
+        document.querySelector(`[data-identifier-hash="${address}"] .add-tag-button`).style.display = "none"
+        document.querySelector(`[data-identifier-hash="${address}"] .close-input-button`).style.display = "block"
+        document.querySelector(`[data-identifier-hash="${address}"] .add-tag-input`).style.display = "block"
+      }
+
+      function tokenPageTransactionShowAddTagInputClose(address) {
+        document.querySelector(`[data-identifier-hash="${address}"] .add-tag-button`).style.display = "block"
+        document.querySelector(`[data-identifier-hash="${address}"] .close-input-button`).style.display = "none"
+        document.querySelector(`[data-identifier-hash="${address}"] .add-tag-input`).style.display = "none"
+        document.querySelector(`[data-identifier-hash="${address}"] .add-tag-input`).value = ""
+      }
+
+      function tokenPageTransactionAddTag(address, e) {
+        e.preventDefault();
+        if(document.querySelector(`[data-identifier-hash="${address}"] .add-tag-input`).value.includes(',')){
+          alert("',' not allowed in tags")
+          tokenPageTransactionShowAddTagInputClose(address)
+          return;
+        }
+        var tag = document.querySelector(`[data-identifier-hash="${address}"] .add-tag-input`).value
+        if (!tag) return;
+        var existingTags = []
+        if(document.querySelector(`[data-identifier-hash="${address}"] .tags`).children.length == 0){
+          existingTags.push(tag);
+        }else{
+          let existingTags2 = document.querySelector(`[data-identifier-hash="${address}"] .tags`).children
+          for(let i =0; i < existingTags2.length; i++){
+            existingTags.push(existingTags2[i].getAttribute('data-tag'));
+          }
+          existingTags.push(tag);
+        }
+        var xhr = new XMLHttpRequest()
+        xhr.open('GET', `/tx/${address}/tag?tags=` + existingTags.join(','), true)
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            let response = xhr.response;
+            response = JSON.parse(response)
+            if (response.result) {
+              var newTagDiv = document.createElement("div")
+              newTagDiv.setAttribute('data-tag', tag)
+              newTagDiv.setAttribute('data-identifier-hash', address)
+              newTagDiv.className = 'chip mr-1'
+              newTagDiv.innerHTML = tag.toLowerCase() + `<span class="closebtn" onclick="tokenPageTransactionRemoveTag('${address}', '${tag}')">&times;</span>`
+              document.querySelector(`[data-identifier-hash="${address}"] .tags`).appendChild(newTagDiv)
+              tokenPageTransactionShowAddTagInputClose(address)
+            }
+          }
+        }
+        xhr.send()
+      }
+    </script>
     <div class="card">
       <%= render OverviewView, "_tabs.html", assigns %>
       <div class="card-body" data-async-load data-async-listing="<%= @current_path %>">
         <h2 class="card-title"><%= gettext "Token Transfers" %></h2>
 
-        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "top", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", show_search_bar: true, position: "top", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
 
         <button data-error-message class="alert alert-danger col-12 text-left" style="display: none;">
           <span href="#" class="alert-link"><%= gettext("Something went wrong, click to reload.") %></span>
@@ -29,7 +107,7 @@
           <%= render BlockScoutWeb.CommonComponentsView, "_tile-loader.html" %>
         </div>
 
-        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", show_search_bar: false, position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
 
       </div>
     </div>

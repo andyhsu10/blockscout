@@ -143,9 +143,32 @@ defmodule Explorer.Chain.TokenTransfer do
   def fetch_token_transfers_from_token_hash(token_address_hash, options) do
     paging_options = Keyword.get(options, :paging_options, @default_paging_options)
 
+     query =
+       from(
+         tt in TokenTransfer,
+         where: tt.token_contract_address_hash == ^token_address_hash and not is_nil(tt.block_number),
+         where: not is_nil(tt.block_number),
+         preload: [{:transaction, :block}, :token, :from_address, :to_address],
+         order_by: [desc: tt.block_number]
+       )
+
+     query
+     |> page_token_transfer(paging_options)
+     |> limit(^paging_options.page_size)
+     |> Repo.all()
+  end
+
+  @spec fetch_token_transfers_from_token_hash_and_tags(Hash.t(), String.t(), [paging_options]) :: []
+  def fetch_token_transfers_from_token_hash_and_tags(token_address_hash, tags, options) do
+    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+
+    matchString = "%" <> tags <> "%"
     query =
       from(
         tt in TokenTransfer,
+        left_join: transaction in Transaction,
+        on: tt.transaction_hash == transaction.hash,
+        where: like(transaction.tags, ^matchString),
         where: tt.token_contract_address_hash == ^token_address_hash and not is_nil(tt.block_number),
         where: not is_nil(tt.block_number),
         preload: [{:transaction, :block}, :token, :from_address, :to_address],

@@ -32,6 +32,7 @@
           <%= formatted_fee(@transaction, denomination: :ether, include_label: false) %> <%= gettext "TX Fee" %>
         </span>
       </span>
+      </span>
 
       <!-- Transfer -->
       <%= if involves_token_transfers?(@transaction) do %>
@@ -54,6 +55,16 @@
           </div>
         <% end %>
       <% end %>
+      <dl class="row mt-2 ml-1">
+        <div id="tags">
+          <%= if @transaction.tags != nil and @transaction.tags != "" do%>
+            <%= for tag <- String.split(@transaction.tags, ",") do %>
+            <div class="chip mr-1" id="<%=@transaction%><%= tag %>"><%= tag %>
+            </div>
+            <% end %>
+          <% end %>
+        </div>
+      </dl>
     </div>
     <!-- Block info -->
     <div class="col-md-3 col-lg-2 d-flex flex-row flex-md-column flex-nowrap justify-content-center text-md-right mt-3 mt-md-0 tile-bottom">

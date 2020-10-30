@@ -14,7 +14,7 @@
           <button data-search-button class="logs-search-btn" type="button"><%= gettext("Search") %></button>
         </div>
 
-        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "top", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", show_search_bar: false, position: "top", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
       </div>
 
         <button data-error-message class="alert alert-danger col-12 text-left" style="display: none;">
@@ -31,7 +31,7 @@
           <%= render BlockScoutWeb.CommonComponentsView, "_tile-loader.html" %>
         </div>
 
-        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", show_search_bar: false, position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
 
     </div>
 

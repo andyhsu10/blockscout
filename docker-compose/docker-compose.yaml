@@ -1,0 +1,84 @@
+dversion: '2.1'
+
+networks:
+  main:
+
+volumes:
+  postgres:
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    networks:
+      - main
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  blockscout_sync_token_data_qqq:
+    image: cakesoft/blockscout_sync_token_data
+    container_name: blockscout_sync_token_data_qqq
+    restart: always
+    networks:
+      - main
+    depends_on:
+      - postgres
+    environment:
+      - WEB3_ENDPOINT=
+      - ETHERSCAN_API_KEY=
+      - ADDRESS=2822f6d1b2f41f93f33d937bc7d84a8dfa4f4c21
+      - SYMBOL=QQQ
+      - SUPPLY=21000000000000000000000000000
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=blockscout
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    command: sh -c "sleep 20s && node app.js"
+
+  blockscout_sync_token_data_qas:
+    image: cakesoft/blockscout_sync_token_data
+    container_name: blockscout_sync_token_data_qas
+    restart: always
+    networks:
+      - main
+    depends_on:
+      - postgres
+    environment:
+      - WEB3_ENDPOINT=
+      - ETHERSCAN_API_KEY=
+      - ADDRESS=31E2ABf378FCC64902a958D79CDEA44250C62CC1
+      - SYMBOL=QAS
+      - SUPPLY=10500000000000000000000000000
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=blockscout
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    command: sh -c "sleep 20s && node app.js"
+
+  blockscout:
+    image: cakesoft/blockscout
+    container_name: blockscout
+    ports:
+      - 80:80
+    restart: always
+    logging:
+      driver: none
+    networks:
+      - main
+    depends_on:
+      - postgres
+    environment:
+      - NETWORK=Ethereum
+      - SUBNETWORK=ETH Mainnet
+      - COIN=ETH
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/blockscout
+      - SECRET_KEY_BASE=RMgI4C1HSkxsEjdhtGMfwAHfyT6CKWXOgzCboJflfSm4jeAlic52io05KB6mqzc5
+      - PORT=80
+      - ECTO_USE_SSL=false
+    command: sh -c "mix do ecto.create, ecto.migrate && mix phx.server"

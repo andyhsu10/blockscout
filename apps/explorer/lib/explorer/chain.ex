@@ -3745,6 +3745,11 @@ defmodule Explorer.Chain do
     TokenTransfer.fetch_token_transfers_from_token_hash(token_address_hash, options)
   end
 
+  @spec fetch_token_transfers_from_token_hash_and_tags(Hash.t(), String.t(), [paging_options]) :: []
+  def fetch_token_transfers_from_token_hash_and_tags(token_address_hash, tags, options \\ []) do
+    TokenTransfer.fetch_token_transfers_from_token_hash_and_tags(token_address_hash, tags, options)
+  end
+
   @spec fetch_token_transfers_from_token_hash_and_token_id(Hash.t(), binary(), [paging_options]) :: []
   def fetch_token_transfers_from_token_hash_and_token_id(token_address_hash, token_id, options \\ []) do
     TokenTransfer.fetch_token_transfers_from_token_hash_and_token_id(token_address_hash, token_id, options)
@@ -4056,6 +4061,13 @@ defmodule Explorer.Chain do
     end
   end
 
+  @spec fetch_token_holders_from_token_hash_and_tags(Hash.Address.t(), String.t(), [paging_options]) :: [TokenBalance.t()]
+  def fetch_token_holders_from_token_hash_and_tags(contract_address_hash, tags, options) do
+    contract_address_hash
+    |> CurrentTokenBalance.token_holders_ordered_by_value_and_tags(tags, options)
+    |> Repo.all()
+  end
+  
   @spec fetch_token_holders_from_token_hash(Hash.Address.t(), [paging_options]) :: [TokenBalance.t()]
   def fetch_token_holders_from_token_hash(contract_address_hash, options) do
     contract_address_hash
@@ -4520,6 +4532,48 @@ defmodule Explorer.Chain do
       )
 
     Repo.exists?(query)
+  end
+
+  @doc """
+  Update Tag transaction with given hash.
+
+  Returns `:ok` if success
+
+  Returns `:error` if failure
+  """
+  @spec update_transaction_tag(Hash.Full.t(), String.t()) :: :ok | :error
+  def update_transaction_tag(hash, newTags) do
+    query =
+      from(
+        transaction in Transaction,
+        where: transaction.hash == ^hash
+      )
+
+    case Repo.update_all(query, set: [tags: String.downcase(newTags, :ascii)]) do
+      {1, _} -> {:ok, []}
+      _ -> {:error, "Update Failed."}
+    end
+  end
+
+  @doc """
+  Update Tag of Address with given hash.
+
+  Returns `:ok` if success
+
+  Returns `:error` if failure
+  """
+  @spec update_address_tag(Hash.Address.t(), String.t()) :: :ok | :error
+  def update_address_tag(hash, newTags) do
+    query =
+      from(
+        address in Address,
+        where: address.hash == ^hash
+      )
+
+    case Repo.update_all(query, set: [tags: String.downcase(newTags, :ascii)]) do
+      {1, _} -> {:ok, []}
+      _ -> {:error, "Update Failed."}
+    end
   end
 
   @doc """

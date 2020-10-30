@@ -54,7 +54,7 @@
         </div>
         <% end %>
 
-        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "top", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", show_search_bar: false, position: "top", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
 
         <div data-empty-response-message class="tile tile-muted text-center" style="display: none;">
           <span><%= gettext "There are no token transfers for this address." %></span>
@@ -70,7 +70,7 @@
           <%= render BlockScoutWeb.CommonComponentsView, "_tile-loader.html" %>
         </div>
 
-        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", show_search_bar: false, position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
 
       </div>
     </div>

@@ -98,6 +98,88 @@
               <% end %>
             </dd>
           </dl>
+          <!-- Tags -->
+          <dl class="row">
+            <dt class="col-sm-3 text-muted"> <%= gettext "Tags" %> </dt>
+            <dd class="tags">
+              <%= if @transaction.tags != nil and @transaction.tags != "" do%>
+                <%= for tag <- String.split(@transaction.tags, ",") do %>
+                  <div class="chip mr-1 mt-1" data-tag="<%= tag %>"><%= tag %>
+                    <span class="closebtn" onclick="transactionPageRemoveTag('<%= tag %>')">&times;</span>
+                  </div>
+                <% end %>
+              <% end %>
+            </dd>
+            <form onsubmit="transactionPageAddTag(event)">
+              <input class="add-tag-input ml-2 mt-2" type="text" style="display:none" />
+            </form>
+            <div class="cross radius ml-1 mt-2 close-input-button" onclick="transactionPageShowAddTagInputClose()" style="display:none" ></div>
+            <div class="plus radius ml-1 mt-2 add-tag-button" onclick="transactionPageShowAddTagInput()"></div>
+          </dl>
+          <script>
+            var tags = '<%= @transaction.tags %>';
+
+            function transactionPageRemoveTag(tag){
+              var newTags = tags.split(',').filter(tag1 => tag1 != tag).join(',');
+              var xhr = new XMLHttpRequest()
+              xhr.open('GET', '/tx/<%= @transaction %>/tag?tags=' + newTags, true)
+              xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                  let response = xhr.response;
+                  response = JSON.parse(response)
+                  if (response.result) {
+                    document.querySelector('[data-tag="' + tag + '"]').remove();
+                    tags = newTags;
+                  }
+                }
+              }
+              xhr.send()
+            }
+
+            function transactionPageShowAddTagInput() {
+              document.querySelector(`.add-tag-button`).style.display = "none"
+              document.querySelector(`.add-tag-input`).style.display = "block"
+              document.querySelector(`.close-input-button`).style.display = "block"
+            }
+
+            function transactionPageShowAddTagInputClose() {
+              document.querySelector(`.add-tag-button`).style.display = "block"
+              document.querySelector(`.add-tag-input`).style.display = "none"
+              document.querySelector(`.close-input-button`).style.display = "none"
+              document.getElementsByClassName("add-tag-input")[0].value = ""
+            }
+
+            function transactionPageAddTag(e) {
+              e.preventDefault();
+              if(document.querySelector(`.add-tag-input`).value.includes(',')){
+                alert("',' not allowed in tags")
+                transactionPageShowAddTagInputClose()
+                return;
+              }
+              tag = document.getElementsByClassName("add-tag-input")[0].value
+              if (!tag) return;
+              var newTags = tags ? tags + ',' + tag : tag
+              var xhr = new XMLHttpRequest()
+              xhr.open('GET', '/tx/<%= @transaction %>/tag?tags=' + newTags, true)
+              xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                  let response = xhr.response;
+                  response = JSON.parse(response)
+                  if (response.result) {
+                    var newTagDiv = document.createElement("div")
+                    newTagDiv.setAttribute('data-tag', tag)
+                    newTagDiv.className = 'chip ml-1'
+                    newTagDiv.innerHTML = tag.toLowerCase() + `<span class="closebtn" onclick="transactionPageRemoveTag('${tag}')">&times;</span>`
+                    document.getElementsByClassName("tags")[0].appendChild(newTagDiv)
+                    tags = newTags
+                    document.getElementsByClassName("add-tag-input")[0].value = ""
+                    transactionPageShowAddTagInputClose()
+                  }
+                }
+              }
+              xhr.send()
+            }
+          </script>
           <!-- Processing Time -->
           <%= case processing_time_duration(@transaction) do %>
             <% :pending -> %>

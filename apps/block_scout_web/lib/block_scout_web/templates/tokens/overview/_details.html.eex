@@ -68,10 +68,16 @@
             </span>
             <div class="d-flex flex-row justify-content-start text-muted">
               <span class="mr-4"> <%= @token.type %> </span>
-              <span token-holder-count class="mr-4"></span>
+              <%# <span token-holder-count class="mr-4"></span> %>
               <span token-transfer-count class="mr-4"></span>
               <%= if decimals?(@token) do %>
                 <span  class="mr-4"><%= @token.decimals %> <%= gettext "Decimals" %></span>
+              <% end %>
+              <%= if !@token.last_sync do%>
+                <span  class="mr-4"><%= gettext "Syncing..." %></span>
+              <% end %>
+              <%= if @token.last_sync do%>
+                <span><%= gettext "Last Synced:" %> <%= formatted_timestamp(@token) %> (<span data-from-now="<%= @token.last_sync %>"></span>)</span>
               <% end %>
             </div>
           </div>

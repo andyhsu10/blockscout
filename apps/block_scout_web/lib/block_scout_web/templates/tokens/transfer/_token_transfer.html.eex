@@ -49,6 +49,22 @@
           <%= link(@token_transfer.token.symbol, to: token_path(BlockScoutWeb.Endpoint, :show, @token_transfer.token.contract_address_hash)) %>
         </span>
       </span>
+      <dl class="row">
+        <dl class="mt-2 ml-1 tags">
+          <%= if @token_transfer.transaction.tags != nil and @token_transfer.transaction.tags != "" do%>
+            <%= for tag <- String.split(@token_transfer.transaction.tags, ",") do %>
+              <span class="chip mr-1 mt-1" data-identifier-hash="<%= @token_transfer.transaction %>" data-tag="<%= tag %>"><%= tag %>
+                <span class="closebtn" data-identifier-hash="<%= @token_transfer.transaction %>" onclick="tokenPageTransactionRemoveTag('<%= @token_transfer.transaction %>', '<%= tag %>')">&times;</span>
+              </span>
+            <% end %>
+          <% end %>
+        </dl>
+        <form onsubmit="tokenPageTransactionAddTag('<%= @token_transfer.transaction %>', event)">
+          <input class="add-tag-input mt-3" data-identifier-hash="<%= @token_transfer.transaction %>" type="text" style="display:none" />
+        </form>
+        <div class="cross radius ml-1 mt-3  close-input-button" data-identifier-hash="<%= @token_transfer.transaction %>" onclick="tokenPageTransactionShowAddTagInputClose('<%= @token_transfer.transaction %>')" style="display:none" ></div>
+        <div class="plus radius ml-1 mt-3 add-tag-button" data-identifier-hash="<%= @token_transfer.transaction %>" onclick="tokenPageTransactionShowAddTagInput('<%= @token_transfer.transaction %>')"></div>
+      </dl>
     </div>
     <!-- Block info -->
     <div class="col-md-3 col-lg-2 d-flex flex-row flex-md-column flex-nowrap justify-content-center text-md-right mt-3 mt-md-0">

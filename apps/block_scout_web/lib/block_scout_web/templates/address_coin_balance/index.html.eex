@@ -30,7 +30,7 @@
           <canvas data-chart="coinBalanceHistoryChart" data-coin_balance_history_data_path="<%= address_coin_balance_by_day_path(@conn, :index, @address) %>" width="350" height="152"></canvas>
         </div>
 
-        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "top", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", show_search_bar: false, position: "top", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
 
         <div data-error-message class="alert alert-danger col-12 text-left" style="display: none; padding: 0.75rem 0rem; cursor: pointer;">
           <span href="#" class="alert alert-danger"><%= gettext("Something went wrong, click to reload.") %></span>
@@ -46,7 +46,7 @@
           <%= render BlockScoutWeb.CommonComponentsView, "_tile-loader.html" %>
         </div>
 
-        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+        <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", show_search_bar: false, position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
 
     </div>
     <script defer data-cfasync="false" src="<%= static_path(@conn, "/js/address-coin-balances.js") %>"></script>

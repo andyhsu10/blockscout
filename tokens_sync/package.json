@@ -1,0 +1,19 @@
+{
+  "name": "poseidonnode",
+  "version": "1.0.0",
+  "description": "Inserts data received from Etherscan API to Postgres DB",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Pratik Patil",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.20.0",
+    "dateformat": "^3.0.3",
+    "dotenv": "^8.2.0",
+    "pg": "^8.3.3",
+    "web3": "^1.2.11"
+  }
+}

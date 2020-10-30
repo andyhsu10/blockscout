@@ -5,7 +5,7 @@
     <div class="card-body" data-async-load data-async-listing="<%= @current_path %>">
       <h1 class="card-title"><%= gettext "Internal Transactions" %></h1>
 
-      <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "top", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+      <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", show_search_bar: false, position: "top", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
 
       <button data-error-message class="alert alert-danger col-12 text-left" style="display: none;">
         <span href="#" class="alert-link"><%= gettext("Something went wrong, click to reload.") %></span>
@@ -20,7 +20,7 @@
         <%= render BlockScoutWeb.CommonComponentsView, "_tile-loader.html" %>
       </div>
 
-      <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+      <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", show_search_bar: false, position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
     </div>
   </div>
 </section>

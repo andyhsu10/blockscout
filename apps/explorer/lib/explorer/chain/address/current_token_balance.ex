@@ -95,6 +95,28 @@ defmodule Explorer.Chain.Address.CurrentTokenBalance do
   end
 
   @doc """
+  Builds an `Ecto.Query` to fetch the token holders from the given token contract address hash and tags.
+
+  The Token Holders are the addresses that own a positive amount of the Token. So this query is
+  considering the following conditions:
+
+  * The token balance from the last block.
+  * Balances greater than 0.
+  * Excluding the burn address (0x0000000000000000000000000000000000000000).
+
+  """
+  def token_holders_ordered_by_value_and_tags(token_contract_address_hash, tags, options \\ []) do
+    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+
+    token_contract_address_hash
+    |> token_holders_query_and_tags(tags)
+    |> preload(:address)
+    |> order_by([tb], desc: :value)
+    |> page_token_balances(paging_options)
+    |> limit(^paging_options.page_size)
+  end
+
+  @doc """
   Builds an `t:Ecto.Query.t/0` to fetch the current token balances of the given address.
   """
   def last_token_balances(address_hash) do
@@ -117,6 +139,24 @@ defmodule Explorer.Chain.Address.CurrentTokenBalance do
       where: tb.token_contract_address_hash == ^token_contract_address_hash,
       where: tb.address_hash != ^@burn_address_hash,
       where: tb.value > 0
+    )
+  end
+
+  @doc """
+  Builds an `t:Ecto.Query.t/0` to fetch addresses that hold the token and tags.
+
+  Token holders cannot be the burn address (#{@burn_address_hash}) and must have a non-zero value.
+  """
+  def token_holders_query_and_tags(token_contract_address_hash, tags) do
+    matchString = "%" <> tags <> "%"
+    from(
+      tb in __MODULE__,
+      left_join: address in Address,
+      on: tb.address_hash == address.hash,
+      where: tb.token_contract_address_hash == ^token_contract_address_hash,
+      where: tb.address_hash != ^@burn_address_hash,
+      where: tb.value > 0,
+      where: like(address.tags, ^matchString)
     )
   end
 

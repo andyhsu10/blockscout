@@ -81,13 +81,111 @@
                   <%= gettext("Last Balance Update: Block #") %><span data-selector="fetched-coin-balance-block-number"><%= @address.fetched_coin_balance_block_number %></span>
                 </span>
               <% end %>
-
+            </span>
               <span class="address-detail-item">
                 <span data-selector="validation-count">
                 </span>
               </span>
             </span>
           </div>
+
+          <%= if Chain.check_if_token_transfers_at_address(@address.hash) do %>
+          <!-- Tags -->
+          <dl class="row mt-2">
+            <dt class="col-sm-2 text-muted"> <%= gettext "Tags" %> </dt>
+            <dd class="tags">
+              <%= if @address.tags != nil and @address.tags != "" do%>
+                <%= for tag <- String.split(@address.tags, ",") do %>
+                <div class="chip mr-1 mt-1" data-tag="<%= tag %>"><%= tag %>
+                  <span class="closebtn" onclick="addressPageRemoveTag('<%= tag %>')">&times;</span>
+                </div>
+                <% end %>
+              <% end %>
+            </dd>
+            <form onsubmit="addressPageAddTag(event)" >
+              <input class="add-tag-input ml-2 mt-2" type="text" style="display:none" />
+            </form>
+            <div class="cross radius ml-1 mt-2 close-input-button" onclick="addressPageShowAddTagInputClose()" style="display:none" ></div>
+            <div class="plus radius ml-1 mt-2 add-tag-button" onclick="addressPageShowAddTagInput()"></div>
+          </dl>
+          <script>
+            function addressPageRemoveTag(tag){
+              var existingTags = [];
+              if(document.querySelector(`.tags`).children.length != 0){
+                let existingTags2 = document.querySelector(`.tags`).children
+                for(let i =0; i < existingTags2.length; i++){
+                  existingTags.push(existingTags2[i].getAttribute('data-tag'));
+                }
+              }else{
+                return;
+              }
+              var newTags = existingTags.filter(tag1 => tag1 != tag);
+              var xhr = new XMLHttpRequest()
+              xhr.open('GET', `/address/<%= @address %>/tag?tags=` + newTags.join(','), true)
+              xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                  let response = xhr.response;
+                  response = JSON.parse(response)
+                  if (response.result) {
+                    document.querySelector('[data-tag="' + tag + '"]').remove();
+                  }
+                }
+              }
+              xhr.send()
+            }
+
+            function addressPageShowAddTagInput() {
+              document.querySelector(`.add-tag-button`).style.display = "none"
+              document.querySelector(`.add-tag-input`).style.display = "block"
+              document.querySelector(`.close-input-button`).style.display = "block"
+            }
+
+            function addressPageShowAddTagInputClose() {
+              document.querySelector(`.add-tag-button`).style.display = "block"
+              document.querySelector(`.add-tag-input`).style.display = "none"
+              document.querySelector(`.close-input-button`).style.display = "none"
+              document.querySelector(`.add-tag-input`).value = ""
+            }
+
+            function addressPageAddTag(e) {
+              e.preventDefault();
+              if(document.querySelector(`.add-tag-input`).value.includes(',')){
+                alert("',' not allowed in tags")
+                addressPageShowAddTagInputClose()
+                return;
+              }
+              var tag = document.querySelector(`.add-tag-input`).value
+              if (!tag) return;
+              var existingTags = [];
+              if(document.querySelector(`.tags`).children.length == 0){
+                existingTags.push(tag);
+              }else{
+                let existingTags2 = document.querySelector(`.tags`).children
+                for(let i =0; i < existingTags2.length; i++){
+                  existingTags.push(existingTags2[i].getAttribute('data-tag'));
+                }
+                existingTags.push(tag);
+              }
+              var xhr = new XMLHttpRequest()
+              xhr.open('GET', `/address/<%= @address %>/tag?tags=` + existingTags.join(','), true)
+              xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                  let response = xhr.response;
+                  response = JSON.parse(response)
+                  if (response.result) {
+                    var newTagDiv = document.createElement("div")
+                    newTagDiv.setAttribute('data-tag', tag)
+                    newTagDiv.className = 'chip mr-1'
+                    newTagDiv.innerHTML = tag.toLowerCase() + `<span class="closebtn" onclick="addressPageRemoveTag('${tag}')">&times;</span>`
+                    document.querySelector(`.tags`).appendChild(newTagDiv)
+                    addressPageShowAddTagInputClose()
+                  }
+                }
+              }
+              xhr.send()
+            }
+          </script>
+          <% end %>
           <% from_address_hash = from_address_hash(@address) %>
 
           <%= if contract?(@address) do %>

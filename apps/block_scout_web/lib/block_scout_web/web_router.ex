@@ -48,7 +48,16 @@ defmodule BlockScoutWeb.WebRouter do
 
     get("/txs", TransactionController, :index)
 
+    
     resources "/tx", TransactionController, only: [:show] do
+      resources(
+        "/tag",
+        UpdateTagTransactionController,
+        only: [:index],
+        as: :update_tag,
+        params: "tags"
+      )
+      
       resources(
         "/internal_transactions",
         TransactionInternalTransactionController,
@@ -76,6 +85,15 @@ defmodule BlockScoutWeb.WebRouter do
     resources("/tokens", TokensController, only: [:index])
 
     resources "/address", AddressController, only: [:show] do
+
+      resources(
+        "/tag",
+        UpdateTagAddressController,
+        only: [:index],
+        as: :update_tag,
+        params: "tags"
+      )
+
       resources("/transactions", AddressTransactionController, only: [:index], as: :transaction)
 
       resources(

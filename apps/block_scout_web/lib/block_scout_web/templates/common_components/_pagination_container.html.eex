@@ -1,4 +1,7 @@
 <div class='pagination-container <%= if assigns[:position] == "top" do %>position-top<% end %> <%= if assigns[:position] == "bottom" do %>position-bottom<% end %>'>
+    <%= if assigns[:show_search_bar] and assigns[:position] == "top"  do %>
+        <input class="form-control mr-5" data-tags-search placeholder="Search by Tags" type="text" style="border: 2px solid #e3e3e5;"/>
+    <% end %>
     <%= if false do %>
     <!-- Pagination limit -->
     <div class="pagination-limit">
